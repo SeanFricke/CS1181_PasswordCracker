@@ -1,9 +1,11 @@
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class Worker extends Thread{
     private final String zipCopyName, dumpName;
@@ -34,21 +36,14 @@ public class Worker extends Thread{
             try {
                 zipFile = new ZipFile(zipCopyName);
                 zipFile.setPassword(cleanPass);
-                zipFile.extractAll("/tmp/" + dumpName);
-                try{
-                    System.out.printf("%s.zip cracked! Password: %s%n", parentCracker.getZip(), cleanPass);
-                    ZipFile zipOG = new ZipFile(parentCracker.getZip() + ".zip");
-                    zipOG.setPassword(cleanPass);
-                    zipOG.extractAll(dumpName+"/");
-                    parentCracker.safeTerminate();
-                } catch (ZipException e){
-                    System.out.println(e);
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+                zipFile.extractAll(dumpName+"_tmp"+ID);
+                System.out.printf("%s.zip cracked! Password: %s%n", parentCracker.getZip(), cleanPass);
+                ZipFile zipOG = new ZipFile(parentCracker.getZip() + ".zip");
+                zipOG.setPassword(cleanPass);
+                zipOG.extractAll(dumpName);
+                parentCracker.safeTerminate();
             } catch (ZipException e) {
-//                System.out.println(cleanPass);
-//                System.out.println(e);
+                continue;
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -59,8 +54,24 @@ public class Worker extends Thread{
     private void deleteCopy(){
         try {
             Files.delete(Path.of(zipCopyName));
+            deleteTMP(dumpName+"_tmp"+ID);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void deleteTMP(String path){
+        File file = new File(path);
+        if (file.isDirectory()){
+            File[] childlist = file.listFiles();
+            if(childlist != null){
+                for(File childfile: childlist){
+                    deleteTMP(childfile.getPath());
+                }
+            }
+            file.delete();
+        } else if (file.isFile()){
+            file.delete();
         }
     }
 }
