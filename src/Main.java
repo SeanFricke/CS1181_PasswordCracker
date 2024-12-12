@@ -18,14 +18,13 @@ public class Main {
     public static void main(String[] args) throws InterruptedException, FileNotFoundException, ArithmeticException {
         Cracker zipCrack = new Cracker(ZIP_PATH, PASSWORD_LENGTH); // Configure cracker with the needed target info
         long crackTime = zipCrack.crack(NUM_THREADS); // Start crack and save time delta as crackTime
-
         // Report logging
         System.out.printf(
                 "%n---Report---%n" +
                 "Target zip: %s.zip%n" +
                 "Password length: %d%n" +
                 "Threads: %d%n" +
-                "Crack Length: %d ms%n",
-                ZIP_PATH, PASSWORD_LENGTH, NUM_THREADS, crackTime);
+                "Crack Length: %d minutes, %d seconds, %d ms",
+                ZIP_PATH, PASSWORD_LENGTH, NUM_THREADS, crackTime/1000/60, (crackTime/1000)%60, crackTime%(1000));
     }
 }
