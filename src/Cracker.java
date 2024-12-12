@@ -29,7 +29,7 @@ public class Cracker {
         }
 
         // If password can fit in a long datatype as base26 with given length, set the field to its length
-        if (password <= 13 && password > 0){
+        if (passLength <= 13 && passLength > 0){
             this.passLength = passLength;
         } else {
             throw new ArithmeticException("Password datatype can only hold character length up to 13");
